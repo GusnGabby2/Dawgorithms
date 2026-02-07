@@ -1,0 +1,30 @@
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+
+import clubsRoutes from "./routes/clubs.js";
+import authRoutes from "./routes/auth.js";
+import schoolsRoutes from "./routes/schools.js";
+import { notFound, errorHandler } from "./middleware/error.js";
+
+const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
+
+// Since you proxy through Next.js (/api -> backend), CORS usually won’t matter much.
+// This is permissive for now (hackathon mode).
+app.use(cors({ origin: true, credentials: true }));
+
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true, server: "express", time: new Date().toISOString() });
+});
+
+app.use("/api/clubs", clubsRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/schools", schoolsRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
+
+export default app;
