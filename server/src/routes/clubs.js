@@ -1,12 +1,25 @@
+
 import { Router } from "express";
+import mongoose from "mongoose";
+import { z } from "zod";
+
 import Club from "../models/Club.js";
+import Membership from "../models/Membership.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { requireAuth } from "../middleware/auth.js";
-import Membership from "../models/Membership.js";
 
 const router = Router();
 
-// CREATE club (logged-in user becomes admin)
+const availabilitySchema = z.object({
+  availability: z.array(
+    z.object({
+      day: z.number().int().min(0).max(6),
+      startMin: z.number().int().min(0).max(1440),
+      endMin: z.number().int().min(0).max(1440)
+    })
+  )
+});
+
 router.post(
   "/",
   requireAuth,
@@ -34,12 +47,15 @@ router.post(
   })
 );
 
-// JOIN club (logged-in user becomes member if not already)
 router.post(
   "/:clubId/join",
   requireAuth,
   asyncHandler(async (req, res) => {
     const { clubId } = req.params;
+
+    if (!mongoose.isValidObjectId(clubId)) {
+      return res.status(400).json({ error: "Invalid club id" });
+    }
 
     const club = await Club.findById(clubId);
     if (!club) return res.status(404).json({ error: "Club not found" });
@@ -54,7 +70,52 @@ router.post(
   })
 );
 
-// LIST clubs
+router.get(
+  "/:clubId/availability",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { clubId } = req.params;
+
+    if (!mongoose.isValidObjectId(clubId)) {
+      return res.status(400).json({ error: "Invalid club id" });
+    }
+
+    const membership = await Membership.findOne({ userId: req.user._id, clubId });
+    if (!membership) {
+      return res.status(404).json({ error: "Not a member of this club" });
+    }
+
+    res.json({ availability: membership.availability });
+  })
+);
+
+router.put(
+  "/:clubId/availability",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const parsed = availabilitySchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
+    }
+
+    const { clubId } = req.params;
+
+    if (!mongoose.isValidObjectId(clubId)) {
+      return res.status(400).json({ error: "Invalid club id" });
+    }
+
+    const membership = await Membership.findOne({ userId: req.user._id, clubId });
+    if (!membership) {
+      return res.status(404).json({ error: "Not a member of this club" });
+    }
+
+    membership.availability = parsed.data.availability;
+    await membership.save();
+
+    res.json({ ok: true, availability: membership.availability });
+  })
+);
+
 router.get(
   "/",
   asyncHandler(async (req, res) => {
