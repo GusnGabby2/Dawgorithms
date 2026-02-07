@@ -7,6 +7,7 @@ import clubsRoutes from "./routes/clubs.js";
 import authRoutes from "./routes/auth.js";
 import schoolsRoutes from "./routes/schools.js";
 import { notFound, errorHandler } from "./middleware/error.js";
+import pollsRoutes from "./routes/polls.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/clubs", clubsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/schools", schoolsRoutes);
 app.use("/api/my", myRoutes);
+app.use("/api/polls", pollsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

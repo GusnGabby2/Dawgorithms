@@ -5,6 +5,9 @@ import { z } from "zod";
 
 import Club from "../models/Club.js";
 import Membership from "../models/Membership.js";
+import Poll from "../models/Poll.js";
+import PollResponse from "../models/PollResponse.js";
+
 import asyncHandler from "../utils/asyncHandler.js";
 import { requireAuth } from "../middleware/auth.js";
 
@@ -18,6 +21,13 @@ const availabilitySchema = z.object({
       endMin: z.number().int().min(0).max(1440)
     })
   )
+});
+
+const createPollSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  closesAt: z.coerce.date(),
+  options: z.array(z.string().min(1)).min(2).optional()
 });
 
 router.post(
@@ -95,7 +105,9 @@ router.put(
   asyncHandler(async (req, res) => {
     const parsed = availabilitySchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
+      return res
+        .status(400)
+        .json({ error: "Invalid input", details: parsed.error.flatten() });
     }
 
     const { clubId } = req.params;
@@ -113,6 +125,76 @@ router.put(
     await membership.save();
 
     res.json({ ok: true, availability: membership.availability });
+  })
+);
+
+router.post(
+  "/:clubId/polls",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { clubId } = req.params;
+
+    if (!mongoose.isValidObjectId(clubId)) {
+      return res.status(400).json({ error: "Invalid club id" });
+    }
+
+    const membership = await Membership.findOne({ userId: req.user._id, clubId });
+    if (!membership) return res.status(403).json({ error: "Not a member of this club" });
+    if (membership.role !== "admin") return res.status(403).json({ error: "Admin only" });
+
+    const parsed = createPollSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res
+        .status(400)
+        .json({ error: "Invalid input", details: parsed.error.flatten() });
+    }
+
+    if (parsed.data.closesAt.getTime() <= Date.now()) {
+      return res.status(400).json({ error: "closesAt must be in the future" });
+    }
+
+    const poll = await Poll.create({
+      clubId,
+      title: parsed.data.title,
+      description: parsed.data.description ?? "",
+      closesAt: parsed.data.closesAt,
+      options: parsed.data.options ?? ["yes", "no", "maybe"],
+      createdByUserId: req.user._id
+    });
+
+    res.status(201).json({ poll });
+  })
+);
+
+router.get(
+  "/:clubId/polls",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { clubId } = req.params;
+
+    if (!mongoose.isValidObjectId(clubId)) {
+      return res.status(400).json({ error: "Invalid club id" });
+    }
+
+    const membership = await Membership.findOne({ userId: req.user._id, clubId });
+    if (!membership) return res.status(403).json({ error: "Not a member of this club" });
+
+    const polls = await Poll.find({ clubId }).sort({ createdAt: -1 });
+
+    const pollIds = polls.map((p) => p._id);
+    const myResponses = await PollResponse.find({
+      pollId: { $in: pollIds },
+      userId: req.user._id
+    });
+
+    const myMap = new Map(myResponses.map((r) => [String(r.pollId), r.choice]));
+
+    res.json({
+      polls: polls.map((p) => ({
+        ...p.toObject(),
+        myChoice: myMap.get(String(p._id)) ?? null
+      }))
+    });
   })
 );
 
