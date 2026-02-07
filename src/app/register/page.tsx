@@ -171,7 +171,7 @@ export default function RegisterPage() {
 
         <div style={{ fontSize: 14, opacity: 0.85 }}>
           Already have an account?{" "}
-          <a href="/login" style={{ textDecoration: "underline" }}>
+          <a href="/" style={{ textDecoration: "underline" }}>
             Log in
           </a>
         </div>
