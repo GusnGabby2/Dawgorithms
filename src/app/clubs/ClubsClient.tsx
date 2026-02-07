@@ -23,7 +23,7 @@ export default function ClubsClient() {
   }
 
   useEffect(() => {
-    refresh().catch(() => setStatus("❌ Failed to load clubs"));
+    refresh().catch(() => setStatus("Failed to load clubs"));
   }, []);
 
   async function createClub(e: React.FormEvent) {
@@ -50,10 +50,10 @@ export default function ClubsClient() {
 
       setName("");
       setDescription("");
-      setStatus("✅ Club created!");
+      setStatus("Club created!");
       await refresh();
     } catch (err: any) {
-      setStatus(`❌ ${err.message || "Something went wrong"}`);
+      setStatus(`${err.message || "Something went wrong"}`);
     } finally {
       setIsLoading(false);
     }
