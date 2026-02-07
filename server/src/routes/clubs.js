@@ -1,4 +1,3 @@
-
 import { Router } from "express";
 import mongoose from "mongoose";
 import { z } from "zod";
@@ -40,9 +39,12 @@ router.post(
       return res.status(400).json({ error: "name is required" });
     }
 
+    const school = String(req.user.school ?? "").trim();
+
     const club = await Club.create({
       name,
       description: description ?? "",
+      school,
       createdByUserId: req.user._id
     });
 
@@ -105,9 +107,10 @@ router.put(
   asyncHandler(async (req, res) => {
     const parsed = availabilitySchema.safeParse(req.body);
     if (!parsed.success) {
-      return res
-        .status(400)
-        .json({ error: "Invalid input", details: parsed.error.flatten() });
+      return res.status(400).json({
+        error: "Invalid input",
+        details: parsed.error.flatten()
+      });
     }
 
     const { clubId } = req.params;
@@ -144,9 +147,10 @@ router.post(
 
     const parsed = createPollSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res
-        .status(400)
-        .json({ error: "Invalid input", details: parsed.error.flatten() });
+      return res.status(400).json({
+        error: "Invalid input",
+        details: parsed.error.flatten()
+      });
     }
 
     if (parsed.data.closesAt.getTime() <= Date.now()) {
@@ -201,7 +205,9 @@ router.get(
 router.get(
   "/",
   asyncHandler(async (req, res) => {
-    const clubs = await Club.find().sort({ createdAt: -1 });
+    const school = String(req.query.school ?? "").trim();
+    const filter = school ? { school } : {};
+    const clubs = await Club.find(filter).sort({ createdAt: -1 });
     res.json(clubs);
   })
 );
