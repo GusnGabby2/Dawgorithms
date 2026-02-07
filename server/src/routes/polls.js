@@ -31,7 +31,7 @@ router.get(
     const membership = await Membership.findOne({ userId: req.user._id, clubId: poll.clubId });
     if (!membership) return res.status(403).json({ error: "Not a member of this club" });
 
-    const my = await PollResponse.findOne({ pollId, userId: req.user._id });
+    const my = await PollResponse.findOne({ pollId: poll._id, userId: req.user._id });
 
     const countsAgg = await PollResponse.aggregate([
       { $match: { pollId: new mongoose.Types.ObjectId(pollId) } },
@@ -115,7 +115,7 @@ router.get(
     const userIds = yesResponses.map((r) => r.userId);
 
     if (userIds.length === 0) {
-      return res.json({ pollId, step, recommendations: [], note: "No YES responses yet" });
+      return res.json({ pollId, step, yesCount: 0, recommendations: [], note: "No YES responses yet" });
     }
 
     const memberships = await Membership.find({ clubId: poll.clubId, userId: { $in: userIds } });
@@ -154,11 +154,26 @@ router.get(
 
     flat.sort((a, b) => b.count - a.count || a.day - b.day || a.startMin - b.startMin);
 
+    const merged = [];
+    for (const slot of flat) {
+      const last = merged[merged.length - 1];
+      if (
+        last &&
+        last.day === slot.day &&
+        last.count === slot.count &&
+        last.endMin === slot.startMin
+      ) {
+        last.endMin = slot.endMin;
+      } else {
+        merged.push({ ...slot });
+      }
+    }
+
     res.json({
       pollId,
       step,
       yesCount: userIds.length,
-      recommendations: flat.slice(0, limit)
+      recommendations: merged.slice(0, limit)
     });
   })
 );
