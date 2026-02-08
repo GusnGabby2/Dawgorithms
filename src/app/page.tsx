@@ -58,8 +58,8 @@ function LoginPageContent() {
   }
 
   return (
-    <main>
-      <div style={{ display: "flex", justifyContent: "center", paddingTop: 24, paddingBottom: 16 }}>
+    <main className="loginPage">
+      <div className="loginBrand">
         <Image
           src={dawgorithm}
           alt="Dawgorithms"
@@ -69,11 +69,11 @@ function LoginPageContent() {
         />
       </div>
 
-      <p><a href="/dashboard">Dashboard</a></p>
+      <h1 className="loginTitle">Login</h1>
 
-      <form onSubmit={onSubmit} style={{ marginTop: 18, display: "grid", gap: 12 }}>
+      <form onSubmit={onSubmit} className="loginForm">
         <label style={{ display: "grid", gap: 6 }}>
-          <span>Email</span>
+          <span className="loginLabel">Email</span>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -85,7 +85,7 @@ function LoginPageContent() {
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span>Password</span>
+          <span className="loginLabel">Password</span>
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -96,13 +96,13 @@ function LoginPageContent() {
           />
         </label>
 
-        <button disabled={loading} style={buttonStyle}>
-          {loading ? "Logging in..." : "Log in"}
+        <button disabled={loading} style={buttonStyle} className="loginButton">
+          {loading ? "Logging in..." : "Login"}
         </button>
 
-        {msg && <div style={{ fontSize: 14 }}>{msg}</div>}
+        {msg && <div className="loginMessage">{msg}</div>}
 
-        <div style={{ fontSize: 14, opacity: 0.85 }}>
+        <div className="loginNote">
           Don’t have an account?{" "}
           <a href="/register" style={{ textDecoration: "underline" }}>
             Register

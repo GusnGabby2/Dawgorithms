@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import your_clubs from "@/assets/box1.png";
 import explore_clubs from "@/assets/box2.png";
-import calendar from "@/assets/box3.png";
 import account from "@/assets/box4.png";
 import dawgorithm from "@/assets/dawgorithmslogo.png";
 
@@ -24,9 +23,6 @@ export default function DashboardPage() {
         </Link>
         <Link href="/explore_clubs" className="dashboardCard">
           <Image src={explore_clubs} alt="Explore Clubs" width={500} height={500} />
-        </Link>
-        <Link href="/calendar" className="dashboardCard">
-          <Image src={calendar} alt="Calendar" width={500} height={500} />
         </Link>
         <Link href="/account" className="dashboardCard">
           <Image src={account} alt="Account" width={500} height={500} />

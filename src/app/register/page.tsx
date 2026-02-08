@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { apiUrl } from "@/lib/api";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
+import dawgorithm from "@/assets/dawgorithmslogo.png";
 
 type ApiError = { error?: string; message?: string };
 
@@ -81,13 +83,22 @@ export default function RegisterPage() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 640, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 800 }}>Register</h1>
+    <main className="registerPage">
+      <div className="registerBrand">
+        <Image
+          src={dawgorithm}
+          alt="Dawgorithms"
+          width={400}
+          height={150}
+          priority
+        />
+      </div>
+      <h1 className="registerTitle">Register</h1>
 
-      <form onSubmit={onSubmit} style={{ marginTop: 18, display: "grid", gap: 12 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>First name</span>
+      <form onSubmit={onSubmit} className="registerForm">
+        <div className="registerRow">
+          <label className="registerField">
+            <span className="loginLabel">First name</span>
             <input
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -96,8 +107,8 @@ export default function RegisterPage() {
             />
           </label>
 
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Last name</span>
+          <label className="registerField">
+            <span className="loginLabel">Last name</span>
             <input
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -107,8 +118,8 @@ export default function RegisterPage() {
           </label>
         </div>
 
-        <label style={{ display: "grid", gap: 6 }}>
-          <span>Email</span>
+        <label className="registerField">
+          <span className="loginLabel">Email</span>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -119,9 +130,9 @@ export default function RegisterPage() {
           />
         </label>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Password</span>
+        <div className="registerRow">
+          <label className="registerField">
+            <span className="loginLabel">Password</span>
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -132,8 +143,8 @@ export default function RegisterPage() {
             />
           </label>
 
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Confirm</span>
+          <label className="registerField">
+            <span className="loginLabel">Confirm</span>
             <input
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
@@ -145,8 +156,8 @@ export default function RegisterPage() {
           </label>
         </div>
 
-        <label style={{ display: "grid", gap: 6 }}>
-          <span>School / University</span>
+        <label className="registerField">
+          <span className="loginLabel">School / University</span>
           <select
             value={school}
             onChange={(e) => setSchool(e.target.value)}
@@ -164,13 +175,13 @@ export default function RegisterPage() {
           </select>
         </label>
 
-        <button disabled={loading} style={buttonStyle}>
+        <button disabled={loading} style={buttonStyle} className="loginButton">
           {loading ? "Creating account..." : "Create account"}
         </button>
 
-        {msg && <div style={{ fontSize: 14 }}>{msg}</div>}
+        {msg && <div className="registerMessage">{msg}</div>}
 
-        <div style={{ fontSize: 14, opacity: 0.85 }}>
+        <div className="registerNote">
           Already have an account?{" "}
           <a href="/" style={{ textDecoration: "underline" }}>
             Log in

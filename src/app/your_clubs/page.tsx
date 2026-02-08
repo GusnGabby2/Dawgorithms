@@ -92,7 +92,7 @@ export default function CalendarPage() {
   }, []);
 
   return (
-    <div style={{ padding: 24, maxWidth: 980, margin: "0 auto" }}>
+    <div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
       <Navbar />
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
         <div>

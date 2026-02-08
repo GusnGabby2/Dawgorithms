@@ -25,6 +25,7 @@
   font-size: 18px;
 }
 
+
 .navLinks {
   display: flex;
   align-items: center;
@@ -91,7 +92,7 @@ p {
   --account-glow: rgba(192, 2, 2, 0.12);
 
   padding: 28px 24px 48px;
-  max-width: 1040px;
+  max-width: 1100px;
   margin: 0 auto;
   display: grid;
   gap: 22px;
@@ -659,12 +660,16 @@ p {
 
 .dashboardGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin-top: 32px;
+  margin-top: 56px;
+  justify-items: center;
 }
 
 .dashboardCard {
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 1 / 1;
   border-radius: 22px;
   border: 1px solid var(--dashboard-line);
   background: var(--dashboard-card);
@@ -675,6 +680,7 @@ p {
   display: grid;
   gap: 12px;
   transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+  align-items: center;
 }
 
 .dashboardCard:hover {
@@ -695,6 +701,121 @@ p {
   font-weight: 700;
   text-align: center;
   color: var(--dashboard-ink);
+}
+
+.loginLabel {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  color: #111827;
+}
+
+.loginButton {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-color: #111827;
+}
+
+.loginPage {
+  padding: 32px 24px 48px;
+  max-width: 720px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.loginBrand {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.loginTitle {
+  font-size: 30px;
+  font-weight: 800;
+  color: #c00202;
+}
+
+.loginForm {
+  margin-top: 6px;
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.loginMessage {
+  font-size: 14px;
+  color: #991b1b;
+}
+
+.loginNote {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.registerPage {
+  padding: 32px 24px 48px;
+  max-width: 720px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.registerBrand {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.registerTitle {
+  font-size: 30px;
+  font-weight: 800;
+  color: #c00202;
+}
+
+.registerForm {
+  margin-top: 6px;
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.registerRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.registerField {
+  display: grid;
+  gap: 6px;
+}
+
+.registerMessage {
+  font-size: 14px;
+  color: #991b1b;
+}
+
+.registerNote {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+@media (max-width: 700px) {
+  .registerRow {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 1100px) {
