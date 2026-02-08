@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { apiUrl } from "@/lib/api";
+import Navbar from "@/components/Navbar";
 
 type ApiError = { error?: string; message?: string };
 
