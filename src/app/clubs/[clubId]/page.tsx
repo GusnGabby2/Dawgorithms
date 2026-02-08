@@ -325,9 +325,10 @@ export default function ClubDetailPage() {
     setMsg(null);
     setMsgType(null);
     try {
-      const res = await fetch(apiUrl(`/polls/${pollId}/recommendations?choice=yes&step=30&limit=5`), {
-        credentials: "include"
-      });
+      const res = await fetch(
+        apiUrl(`/polls/${pollId}/recommendations?choice=yes&step=30&limit=5`),
+        { credentials: "include" }
+      );
       if (!res.ok) {
         const data: ApiError = await res.json().catch(() => ({}));
         throw new Error(data.error || data.message || "Failed to load recommendations.");
@@ -928,6 +929,7 @@ const pollCard: React.CSSProperties = {
   display: "grid",
   gap: 6
 };
+
 
 const eventCard: React.CSSProperties = {
   borderRadius: 12,
