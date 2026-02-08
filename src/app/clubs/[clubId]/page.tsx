@@ -71,7 +71,6 @@ export default function ClubDetailPage() {
   const clubId = String(params?.clubId ?? "");
 
   const [club, setClub] = useState<Club | null>(null);
-  const [memberCount, setMemberCount] = useState(0);
   const [isMember, setIsMember] = useState(false);
   const [myRole, setMyRole] = useState<"admin" | "member" | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,7 +79,6 @@ export default function ClubDetailPage() {
   const [msgType, setMsgType] = useState<"success" | "error" | null>(null);
 
   const [joinLoading, setJoinLoading] = useState(false);
-
   const [availability, setAvailability] = useState<AvailabilityBlock[]>([]);
   const [availDay, setAvailDay] = useState(1);
   const [availStart, setAvailStart] = useState("17:00");
@@ -126,7 +124,6 @@ export default function ClubDetailPage() {
       }
       const data: ClubDetailResponse = await res.json();
       setClub(data.club);
-      setMemberCount(data.memberCount);
       setIsMember(data.isMember);
       setMyRole(data.myRole);
     } catch (e: any) {
@@ -321,30 +318,6 @@ export default function ClubDetailPage() {
     }
   }
 
-  async function loadRecommendations(pollId: string) {
-    setMsg(null);
-    setMsgType(null);
-    try {
-      const res = await fetch(
-        apiUrl(`/polls/${pollId}/recommendations?choice=yes&step=30&limit=5`),
-        { credentials: "include" }
-      );
-      if (!res.ok) {
-        const data: ApiError = await res.json().catch(() => ({}));
-        throw new Error(data.error || data.message || "Failed to load recommendations.");
-      }
-      const data = await res.json();
-      const items = (data.recommendations ?? []).map(
-        (r: any) => `${dayNames[r.day]} ${minToTime(r.startMin)}–${minToTime(r.endMin)} (${r.count})`
-      );
-      setMsg(items.length ? `Top times: ${items.join(", ")}` : "No recommendations yet.");
-      setMsgType("success");
-    } catch (e: any) {
-      setMsg(e?.message ?? "Failed to load recommendations.");
-      setMsgType("error");
-    }
-  }
-
   async function createEvent(e: React.FormEvent) {
     e.preventDefault();
     setEventLoading(true);
@@ -452,45 +425,17 @@ export default function ClubDetailPage() {
     <main style={page}>
       <Navbar />
 
-      <header style={hero}>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          {club.imageUrl ? (
-            <img src={club.imageUrl} alt={club.name} style={clubImg} />
-          ) : (
-            <div style={clubImgPlaceholder}>No image</div>
-          )}
-          <div>
-            <div style={kicker}>{club.school || "Club"}</div>
-            <h1 style={title}>{club.name}</h1>
-            <p style={subtitle}>{club.description || "No description yet."}</p>
-            <div style={metaRow}>
-              <span style={metaPill}>{memberCount} member{memberCount === 1 ? "" : "s"}</span>
-              {isMember ? (
-                <span style={metaPillStrong}>Joined • {myRole ?? "member"}</span>
-              ) : (
-                <span style={metaPillMuted}>Not a member</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          {!isMember && (
+      {!isMember && (
+        <section style={card}>
+          <div style={cardTitle}>{club.name}</div>
+          <div style={cardSub}>{club.description || "No description yet."}</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button onClick={joinClub} disabled={joinLoading} style={buttonPrimary}>
               {joinLoading ? "Joining..." : "Join club"}
             </button>
-          )}
-          <Link href="/explore_clubs" style={ghostButton}>
-            Back to explore
-          </Link>
-        </div>
-      </header>
-
-      {!isMember && (
-        <section style={card}>
-          <div style={{ fontWeight: 800 }}>Join to unlock club tools</div>
-          <div style={{ marginTop: 6, color: "#475569" }}>
-            Members can set availability, vote in polls, and RSVP to events.
+            <Link href="/explore_clubs" style={ghostButton}>
+              Back to explore
+            </Link>
           </div>
         </section>
       )}
@@ -573,9 +518,6 @@ export default function ClubDetailPage() {
                             {opt}
                           </button>
                         ))}
-                        <button onClick={() => loadRecommendations(p._id)} style={buttonGhostSmall}>
-                          Recommendations
-                        </button>
                       </div>
                     </div>
                   );
@@ -718,96 +660,6 @@ const page: React.CSSProperties = {
   gap: 18
 };
 
-const hero: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: 16,
-  alignItems: "center",
-  padding: 20,
-  borderRadius: 18,
-  border: "1px solid #e2e8f0",
-  background: "linear-gradient(120deg, #f8fafc, #eef2ff)"
-};
-
-const clubImg: React.CSSProperties = {
-  width: 90,
-  height: 90,
-  borderRadius: 16,
-  objectFit: "cover",
-  border: "1px solid #e2e8f0",
-  background: "#fff"
-};
-
-const clubImgPlaceholder: React.CSSProperties = {
-  width: 90,
-  height: 90,
-  borderRadius: 16,
-  border: "1px solid #e2e8f0",
-  background: "#f8fafc",
-  display: "grid",
-  placeItems: "center",
-  color: "#94a3b8",
-  fontSize: 12,
-  fontWeight: 700
-};
-
-const kicker: React.CSSProperties = {
-  fontSize: 12,
-  textTransform: "uppercase",
-  letterSpacing: "0.12em",
-  fontWeight: 700,
-  color: "#0f172a"
-};
-
-const title: React.CSSProperties = {
-  margin: "6px 0 6px",
-  fontSize: 30,
-  fontWeight: 900
-};
-
-const subtitle: React.CSSProperties = {
-  margin: 0,
-  fontSize: 15,
-  color: "#475569"
-};
-
-const metaRow: React.CSSProperties = {
-  marginTop: 8,
-  display: "flex",
-  gap: 8,
-  flexWrap: "wrap"
-};
-
-const metaPill: React.CSSProperties = {
-  padding: "6px 10px",
-  borderRadius: 999,
-  border: "1px solid #cbd5f5",
-  background: "#eef2ff",
-  fontSize: 12,
-  fontWeight: 700,
-  color: "#3730a3"
-};
-
-const metaPillStrong: React.CSSProperties = {
-  padding: "6px 10px",
-  borderRadius: 999,
-  border: "1px solid #86efac",
-  background: "#f0fdf4",
-  fontSize: 12,
-  fontWeight: 700,
-  color: "#166534"
-};
-
-const metaPillMuted: React.CSSProperties = {
-  padding: "6px 10px",
-  borderRadius: 999,
-  border: "1px solid #e2e8f0",
-  background: "#f8fafc",
-  fontSize: 12,
-  fontWeight: 700,
-  color: "#475569"
-};
-
 const grid: React.CSSProperties = {
   display: "grid",
   gap: 16
@@ -884,7 +736,7 @@ const buttonGhostSmall: React.CSSProperties = {
 };
 
 const ghostButton: React.CSSProperties = {
-  padding: "8px 14px",
+  padding: "10px 14px",
   borderRadius: 10,
   border: "1px solid #cbd5f5",
   textDecoration: "none",
