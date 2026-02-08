@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { apiUrl } from "@/lib/api";
 
 type User = {
   id: string;
@@ -12,75 +13,60 @@ type User = {
   school: string;
 };
 
-type AvailabilityBlock = {
-  day: number; // 0=Sun..6=Sat
-  startMin: number;
-  endMin: number;
-};
-
-type Club = {
+type ExploreClub = {
   _id: string;
   name: string;
   description?: string;
+  school?: string;
+  memberCount: number;
+  isMember: boolean;
+  myRole: "admin" | "member" | null;
 };
 
-type MyClubItem = {
-  role: "admin" | "member";
-  availability: AvailabilityBlock[];
-  club: Club;
+type ExploreResponse = {
+  clubs: ExploreClub[];
 };
 
-const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function minToTime(min: number) {
-  const h24 = Math.floor(min / 60);
-  const m = min % 60;
-  const ampm = h24 >= 12 ? "PM" : "AM";
-  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-  return `${h12}:${m.toString().padStart(2, "0")} ${ampm}`;
-}
-
-function blockLabel(b: AvailabilityBlock) {
-  const day = dayNames[b.day] ?? `Day${b.day}`;
-  return `${day} ${minToTime(b.startMin)}–${minToTime(b.endMin)}`;
-}
-
-export default function CalendarPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [clubs, setClubs] = useState<MyClubItem[]>([]);
+export default function ExploreClubsPage() {
+  const [me, setMe] = useState<User | null>(null);
+  const [clubs, setClubs] = useState<ExploreClub[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [schoolFilter, setSchoolFilter] = useState("");
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
 
-  const totalBlocks = useMemo(
-    () => clubs.reduce((sum, c) => sum + (c.availability?.length ?? 0), 0),
-    [clubs]
-  );
+  async function loadClubs(school: string) {
+    const params = school ? `?school=${encodeURIComponent(school)}` : "";
+    const res = await fetch(apiUrl(`/clubs/explore${params}`), { credentials: "include" });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(txt || "Failed to load clubs.");
+    }
+    const data: ExploreResponse = await res.json();
+    setClubs(data.clubs);
+  }
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       setErr(null);
+      setMsg(null);
 
       try {
-        // 1) Who am I?
-        const meRes = await fetch("/api/auth/me", { credentials: "include" });
+        const meRes = await fetch(apiUrl("/auth/me"), { credentials: "include" });
         if (!meRes.ok) {
-          setUser(null);
+          setErr("You’re not logged in. Log in to explore clubs.");
+          setMe(null);
           setClubs([]);
-          setErr("You’re not logged in. Log in to see your calendar.");
           return;
         }
         const meData = await meRes.json();
-        setUser(meData.user);
-
-        // 2) My clubs (and availability per club)
-        const clubsRes = await fetch("/api/my/clubs", { credentials: "include" });
-        if (!clubsRes.ok) {
-          const txt = await clubsRes.text();
-          throw new Error(txt || "Failed to load clubs");
-        }
-        const clubsData: MyClubItem[] = await clubsRes.json();
-        setClubs(clubsData);
+        setMe(meData.user);
+        const school = String(meData.user?.school ?? "").trim();
+        setSchoolFilter(school);
+        await loadClubs(school);
       } catch (e: any) {
         setErr(e?.message ?? "Something went wrong");
       } finally {
@@ -91,136 +77,361 @@ export default function CalendarPage() {
     load();
   }, []);
 
+  async function applyFilter() {
+    setLoading(true);
+    setErr(null);
+    setMsg(null);
+    try {
+      await loadClubs(schoolFilter.trim());
+    } catch (e: any) {
+      setErr(e?.message ?? "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function joinClub(clubId: string) {
+    setJoiningId(clubId);
+    setMsg(null);
+    try {
+      const res = await fetch(apiUrl(`/clubs/${clubId}/join`), {
+        method: "POST",
+        credentials: "include"
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || "Failed to join club.");
+      }
+      await loadClubs(schoolFilter.trim());
+      setMsg("Joined club successfully.");
+    } catch (e: any) {
+      setMsg(e?.message ?? "Failed to join club.");
+    } finally {
+      setJoiningId(null);
+    }
+  }
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return clubs;
+    return clubs.filter((c) => {
+      const text = `${c.name} ${c.description ?? ""} ${c.school ?? ""}`.toLowerCase();
+      return text.includes(q);
+    });
+  }, [clubs, query]);
+
   return (
-    <div style={{ padding: 24, maxWidth: 980, margin: "0 auto" }}>
+    <main style={page}>
       <Navbar />
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+
+      <header style={hero}>
         <div>
-          <h1 style={{ fontSize: 28, margin: 0 }}>Calendar</h1>
-          <p style={{ marginTop: 6, opacity: 0.75 }}>
-            Availability and club scheduling hub (events coming next).
+          <div style={kicker}>Explore Clubs</div>
+          <h1 style={title}>Find your people</h1>
+          <p style={subtitle}>
+            Browse clubs at your school, check popularity, and join instantly.
           </p>
         </div>
+        <Link href="/dashboard" style={ghostButton}>
+          Back to dashboard
+        </Link>
+      </header>
 
-        <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard" style={{ textDecoration: "underline" }}>
-            Back to Dashboard
-          </Link>
+      <section style={controls}>
+        <div style={searchBlock}>
+          <label style={label}>Search</label>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search clubs by name or description"
+            style={input}
+          />
         </div>
-      </div>
 
-      <div
-        style={{
-          marginTop: 16,
-          padding: 14,
-          border: "1px solid rgba(0,0,0,0.12)",
-          borderRadius: 12
-        }}
-      >
-        {loading ? (
-          <p style={{ margin: 0 }}>Loading…</p>
-        ) : err ? (
-          <div>
-            <p style={{ margin: 0 }}>{err}</p>
-            <p style={{ marginTop: 10, opacity: 0.75 }}>
-              Tip: log in first, then refresh this page.
-            </p>
+        <div style={searchBlock}>
+          <label style={label}>School</label>
+          <div style={{ display: "flex", gap: 10 }}>
+            <input
+              value={schoolFilter}
+              onChange={(e) => setSchoolFilter(e.target.value)}
+              placeholder="Filter by school"
+              style={input}
+            />
+            <button style={buttonPrimary} onClick={applyFilter} disabled={loading}>
+              Apply
+            </button>
           </div>
-        ) : (
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-            <div>
-              <div style={{ fontWeight: 600 }}>
-                {user?.firstName} {user?.lastName}
-              </div>
-              <div style={{ opacity: 0.75 }}>{user?.email}</div>
-              <div style={{ opacity: 0.75 }}>{user?.school}</div>
-            </div>
+        </div>
+      </section>
 
-            <div style={{ marginLeft: "auto" }}>
-              <div style={{ fontWeight: 600 }}>Summary</div>
-              <div style={{ opacity: 0.75 }}>{clubs.length} club(s)</div>
-              <div style={{ opacity: 0.75 }}>{totalBlocks} availability block(s)</div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {!loading && !err && (
-        <div style={{ marginTop: 18 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 10 }}>Your Clubs & Availability</h2>
-
-          {clubs.length === 0 ? (
-            <p style={{ opacity: 0.8 }}>
-              You’re not in any clubs yet. Join one from “Explore Clubs”.
-            </p>
+      {loading ? (
+        <div style={statusCard}>Loading clubs…</div>
+      ) : err ? (
+        <div style={statusCard}>{err}</div>
+      ) : (
+        <section style={grid}>
+          {filtered.length === 0 ? (
+            <div style={statusCard}>No clubs found.</div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
-              {clubs.map((c) => (
-                <div
-                  key={c.club._id}
-                  style={{
-                    padding: 14,
-                    border: "1px solid rgba(0,0,0,0.12)",
-                    borderRadius: 12
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                    <div>
-                      <div style={{ fontWeight: 700 }}>{c.club.name}</div>
-                      <div style={{ opacity: 0.75 }}>{c.club.description || "No description"}</div>
-                      <div style={{ marginTop: 6, fontSize: 13, opacity: 0.7 }}>
-                        Role: <b>{c.role}</b>
-                      </div>
-                    </div>
-
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontWeight: 600 }}>Availability</div>
-                      <div style={{ opacity: 0.75 }}>{c.availability.length} block(s)</div>
-                      <div style={{ marginTop: 8 }}>
-                        <Link
-                          href={`/clubs/${c.club._id}`}
-                          style={{ textDecoration: "underline" }}
-                        >
-                          View club
-                        </Link>
-                      </div>
-                    </div>
+            filtered.map((club) => (
+              <article key={club._id} style={card}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                  <div>
+                    <div style={cardTitle}>{club.name}</div>
+                    <div style={cardSub}>{club.description || "No description yet."}</div>
                   </div>
-
-                  <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {c.availability.length === 0 ? (
-                      <span style={{ opacity: 0.7 }}>No availability set yet.</span>
-                    ) : (
-                      c.availability.map((b, idx) => (
-                        <span
-                          key={`${c.club._id}-${idx}`}
-                          style={{
-                            padding: "6px 10px",
-                            borderRadius: 999,
-                            border: "1px solid rgba(0,0,0,0.14)",
-                            fontSize: 13
-                          }}
-                        >
-                          {blockLabel(b)}
-                        </span>
-                      ))
-                    )}
+                  <div style={pill}>
+                    {club.memberCount} member{club.memberCount === 1 ? "" : "s"}
                   </div>
                 </div>
-              ))}
-            </div>
+
+                <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
+                  {club.school && <span style={tag}>{club.school}</span>}
+                  {club.isMember ? (
+                    <span style={tagStrong}>Joined • {club.myRole ?? "member"}</span>
+                  ) : (
+                    <span style={tagMuted}>Not a member</span>
+                  )}
+                </div>
+
+                <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+                  <button
+                    style={club.isMember ? buttonDisabled : buttonPrimary}
+                    onClick={() => joinClub(club._id)}
+                    disabled={club.isMember || joiningId === club._id}
+                  >
+                    {club.isMember ? "Joined" : joiningId === club._id ? "Joining..." : "Join"}
+                  </button>
+                  <Link href={`/clubs/${club._id}`} style={ghostButton}>
+                    View club
+                  </Link>
+                </div>
+              </article>
+            ))
           )}
+        </section>
+      )}
+
+      {msg && <div style={message}>{msg}</div>}
+
+      {me && !err && (
+        <div style={footerNote}>
+          Showing clubs for <b>{schoolFilter || me.school}</b>.
         </div>
       )}
 
-      <div style={{ marginTop: 22, padding: 14, borderTop: "1px solid rgba(0,0,0,0.12)" }}>
-        <div style={{ fontWeight: 700 }}>Next up</div>
-        <ul style={{ marginTop: 8 }}>
-          <li>Polls: admin creates, members respond, closesAt enforced</li>
-          <li>Recommendations: compute best times from YES + availability</li>
-          <li>Events: create + RSVP + “Add to Google Calendar” link</li>
-        </ul>
-      </div>
-    </div>
+      <footer style={footerCta}>
+        <span>Don&apos;t see your club?</span>
+        <Link href="/clubs/new" style={footerLink}>
+          Click here to create one
+        </Link>
+      </footer>
+    </main>
   );
 }
+
+const page: React.CSSProperties = {
+  padding: 24,
+  maxWidth: 1100,
+  margin: "0 auto",
+  display: "grid",
+  gap: 18
+};
+
+const hero: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 16,
+  padding: 20,
+  borderRadius: 18,
+  border: "1px solid #e2e8f0",
+  background: "linear-gradient(120deg, #f8fafc, #ecfeff)"
+};
+
+const kicker: React.CSSProperties = {
+  fontSize: 12,
+  textTransform: "uppercase",
+  letterSpacing: "0.12em",
+  fontWeight: 700,
+  color: "#0f172a"
+};
+
+const title: React.CSSProperties = {
+  margin: "6px 0 6px",
+  fontSize: 30,
+  fontWeight: 900
+};
+
+const subtitle: React.CSSProperties = {
+  margin: 0,
+  fontSize: 15,
+  color: "#475569"
+};
+
+const controls: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: 16
+};
+
+const searchBlock: React.CSSProperties = {
+  display: "grid",
+  gap: 8
+};
+
+const label: React.CSSProperties = {
+  fontSize: 12,
+  textTransform: "uppercase",
+  letterSpacing: "0.08em",
+  fontWeight: 700,
+  color: "#475569"
+};
+
+const input: React.CSSProperties = {
+  padding: "10px 12px",
+  borderRadius: 10,
+  border: "1px solid #cbd5f5",
+  fontSize: 14,
+  color: "#0f172a",
+  background: "#fff"
+};
+
+const grid: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: 16
+};
+
+const card: React.CSSProperties = {
+  borderRadius: 16,
+  border: "1px solid #e2e8f0",
+  background: "#fff",
+  padding: 16,
+  boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+  display: "grid"
+};
+
+const cardTitle: React.CSSProperties = {
+  fontSize: 18,
+  fontWeight: 900
+};
+
+const cardSub: React.CSSProperties = {
+  marginTop: 6,
+  fontSize: 14,
+  color: "#64748b"
+};
+
+const pill: React.CSSProperties = {
+  padding: "6px 10px",
+  borderRadius: 999,
+  border: "1px solid #94a3b8",
+  fontSize: 12,
+  fontWeight: 700,
+  height: "fit-content"
+};
+
+const tag: React.CSSProperties = {
+  padding: "6px 10px",
+  borderRadius: 999,
+  border: "1px solid #cbd5f5",
+  background: "#eef2ff",
+  fontSize: 12,
+  fontWeight: 700,
+  color: "#3730a3"
+};
+
+const tagStrong: React.CSSProperties = {
+  padding: "6px 10px",
+  borderRadius: 999,
+  border: "1px solid #86efac",
+  background: "#f0fdf4",
+  fontSize: 12,
+  fontWeight: 700,
+  color: "#166534"
+};
+
+const tagMuted: React.CSSProperties = {
+  padding: "6px 10px",
+  borderRadius: 999,
+  border: "1px solid #e2e8f0",
+  background: "#f8fafc",
+  fontSize: 12,
+  fontWeight: 700,
+  color: "#475569"
+};
+
+const buttonPrimary: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 10,
+  border: "1px solid #0f172a",
+  background: "#0f172a",
+  color: "#fff",
+  fontWeight: 800,
+  cursor: "pointer"
+};
+
+const buttonDisabled: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 10,
+  border: "1px solid #cbd5f5",
+  background: "#e2e8f0",
+  color: "#64748b",
+  fontWeight: 800,
+  cursor: "not-allowed"
+};
+
+const ghostButton: React.CSSProperties = {
+  padding: "8px 14px",
+  borderRadius: 10,
+  border: "1px solid #cbd5f5",
+  textDecoration: "none",
+  color: "#0f172a",
+  fontWeight: 700,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center"
+};
+
+const statusCard: React.CSSProperties = {
+  padding: 16,
+  borderRadius: 12,
+  border: "1px solid #e2e8f0",
+  background: "#f8fafc",
+  fontSize: 14
+};
+
+const message: React.CSSProperties = {
+  padding: "10px 12px",
+  borderRadius: 10,
+  border: "1px solid #bbf7d0",
+  background: "#f0fdf4",
+  color: "#166534",
+  fontSize: 14,
+  width: "fit-content"
+};
+
+const footerNote: React.CSSProperties = {
+  fontSize: 13,
+  color: "#475569"
+};
+
+const footerCta: React.CSSProperties = {
+  marginTop: 8,
+  padding: "14px 16px",
+  borderRadius: 12,
+  border: "1px dashed #cbd5f5",
+  background: "#f8fafc",
+  display: "flex",
+  gap: 10,
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: 700,
+  color: "#0f172a"
+};
+
+const footerLink: React.CSSProperties = {
+  color: "#1d4ed8",
+  textDecoration: "underline"
+};

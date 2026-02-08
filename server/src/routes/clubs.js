@@ -33,10 +33,14 @@ router.post(
   "/",
   requireAuth,
   asyncHandler(async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, imageUrl } = req.body;
 
     if (!name || typeof name !== "string") {
       return res.status(400).json({ error: "name is required" });
+    }
+
+    if (imageUrl !== undefined && typeof imageUrl !== "string") {
+      return res.status(400).json({ error: "imageUrl must be a string" });
     }
 
     const school = String(req.user.school ?? "").trim();
@@ -44,6 +48,7 @@ router.post(
     const club = await Club.create({
       name,
       description: description ?? "",
+      imageUrl: imageUrl ?? "",
       school,
       createdByUserId: req.user._id
     });
@@ -56,6 +61,50 @@ router.post(
     });
 
     res.status(201).json(club);
+  })
+);
+
+router.get(
+  "/explore",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const school = String(req.query.school ?? req.user.school ?? "").trim();
+    const filter = school ? { school } : {};
+
+    const clubs = await Club.find(filter).sort({ createdAt: -1 });
+    const clubIds = clubs.map((c) => c._id);
+
+    if (clubIds.length === 0) {
+      return res.json({ clubs: [] });
+    }
+
+    const memberships = await Membership.find({
+      userId: req.user._id,
+      clubId: { $in: clubIds }
+    }).select("clubId role");
+
+    const counts = await Membership.aggregate([
+      { $match: { clubId: { $in: clubIds } } },
+      { $group: { _id: "$clubId", count: { $sum: 1 } } }
+    ]);
+
+    const countMap = new Map(counts.map((c) => [String(c._id), c.count]));
+    const membershipMap = new Map(
+      memberships.map((m) => [String(m.clubId), { role: m.role }])
+    );
+
+    res.json({
+      clubs: clubs.map((club) => {
+        const id = String(club._id);
+        const membership = membershipMap.get(id);
+        return {
+          ...club.toObject(),
+          memberCount: countMap.get(id) ?? 0,
+          isMember: Boolean(membership),
+          myRole: membership?.role ?? null
+        };
+      })
+    });
   })
 );
 

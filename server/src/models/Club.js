@@ -4,6 +4,7 @@ const ClubSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String, default: "" },
+    imageUrl: { type: String, default: "", trim: true },
     school: { type: String, default: "", trim: true }, // <--- add this
     createdByUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
   },
