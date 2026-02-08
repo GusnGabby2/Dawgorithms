@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 type ApiError = { error?: string; message?: string };
 
@@ -53,8 +54,7 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
+      const res = await fetch(apiUrl("/auth/register"), {        method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({

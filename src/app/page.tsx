@@ -2,6 +2,7 @@
       
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { apiUrl } from "@/lib/api";
 
 type ApiError = { error?: string; message?: string };
 
@@ -35,7 +36,7 @@ function LoginPageContent() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(apiUrl("/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
