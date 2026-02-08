@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 type User = {
   id: string;
@@ -92,6 +93,7 @@ export default function CalendarPage() {
 
   return (
     <div style={{ padding: 24, maxWidth: 980, margin: "0 auto" }}>
+      <Navbar />
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
         <div>
           <h1 style={{ fontSize: 28, margin: 0 }}>Calendar</h1>
