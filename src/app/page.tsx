@@ -2,7 +2,8 @@
       
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { apiUrl } from "@/lib/api";
+import Image from "next/image";
+import dawgorithm from "@/assets/dawgorithmslogo.png";
 
 type ApiError = { error?: string; message?: string };
 
@@ -30,13 +31,13 @@ function LoginPageContent() {
     setMsg(null);
 
     if (!email.trim() || !password) {
-      setMsg("Please enter email + password.");
+      setMsg("Please enter email and password.");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch(apiUrl("/auth/login"), {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -57,8 +58,16 @@ function LoginPageContent() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 520, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 800 }}>Dawgorithm</h1>
+    <main>
+      <div style={{ display: "flex", justifyContent: "center", paddingTop: 24, paddingBottom: 16 }}>
+        <Image
+          src={dawgorithm}
+          alt="Dawgorithms"
+          width={400}
+          height={150}
+          priority
+        />
+      </div>
 
       <p><a href="/dashboard">Dashboard</a></p>
 
