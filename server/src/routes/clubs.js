@@ -108,6 +108,31 @@ router.get(
   })
 );
 
+router.get(
+  "/:clubId",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { clubId } = req.params;
+
+    if (!mongoose.isValidObjectId(clubId)) {
+      return res.status(400).json({ error: "Invalid club id" });
+    }
+
+    const club = await Club.findById(clubId);
+    if (!club) return res.status(404).json({ error: "Club not found" });
+
+    const membership = await Membership.findOne({ userId: req.user._id, clubId });
+    const memberCount = await Membership.countDocuments({ clubId });
+
+    res.json({
+      club,
+      memberCount,
+      isMember: Boolean(membership),
+      myRole: membership?.role ?? null
+    });
+  })
+);
+
 router.post(
   "/:clubId/join",
   requireAuth,
