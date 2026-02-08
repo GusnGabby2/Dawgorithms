@@ -1,4 +1,3 @@
-UGAHacks Project README
 Project Title: Dawgorithm
 Team Members: Chloe Malimban, Braden Coghlan, Josh Lumogdang, and Marion Manalo
 Purpose: Full-stack implementation of a club management platform that uses API’s, authentication, and databases with the goal of garnering interests for clubs. Users sign in with the school email addresses to be sorted into their respective college. From there, users can create their own clubs, with the ability to add descriptions and images, or join clubs made by others.
