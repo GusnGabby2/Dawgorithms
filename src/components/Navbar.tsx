@@ -1,15 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
+import dawgorithm from "@/assets/dawgorithmssmalllogo.png";
 
 const Navbar = () => {
   return (
-    <nav>
-        <div>Dawgorithm</div>
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/your_clubs">Your Clubs</Link>
-            <Link href="/explore_clubs">Explore Clubs</Link> 
-            <Link href="/calendar">Calendar</Link>
-            <Link href="/account">Account</Link>
-    </nav>
+    <header className="navbar">
+      <nav className="navInner">
+        <Link href="/dashboard"><Image src={dawgorithm} alt="Dawgorithms" width={50} height={50}></Image></Link>
+        <div className="navLinks">
+            <Link href="/your_clubs" className="navLink">Your Clubs</Link>
+            <Link href="/explore_clubs" className="navLink">Explore Clubs</Link> 
+            <Link href="/calendar" className="navLink">Calendar</Link>
+            <Link href="/account" className="navLink">Account</Link>
+        </div>
+      </nav>
+    </header>
   );
 }
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 type User = {
   id: string;

@@ -1,0 +1,83 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--background);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.navInner {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 14px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.navBrand {
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  color: rgb(192, 2, 2);
+  font-size: 18px;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  text-decoration: none;
+  color: var(--foreground);
+  font-weight: 700;
+  font-size: 14px;
+
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.navLink:hover {
+  background: rgba(208, 58, 58, 0.621);
+  border-color: rgba(169, 39, 39, 0.441);
+} 
+
+.navLink:active {
+  transform: translateY(1px);
+}
+
+.navLink:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.25);
+  outline-offset: 2px;
+}
+
+h1 {
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    text-decoration: none;
+    color: rgb(192, 2, 2);
+    font-size: 30px;
+    text-align: center;
+}
+
+h2 {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    text-decoration: none;
+    color: rgba(13, 1, 1, 0.921);
+    font-size: 28px;
+}
+
+p {
+    font-size: 16px;
+    color: var(--foreground);
+    line-height: 1.5;
+}
