@@ -8,8 +8,8 @@ import dawgorithm from "@/assets/dawgorithmslogo.png";
 
 export default function DashboardPage() {
   return (
-    <main style={{ padding: 28, maxWidth: 1350, margin: "0 auto" }}>
-      <div style={{ display: "flex", justifyContent: "center", paddingTop: 24, paddingBottom: 16 }}>
+    <main className="dashboardPage">
+      <div className="dashboardBrand">
         <Image
           src={dawgorithm}
           alt="Dawgorithms"
@@ -18,12 +18,20 @@ export default function DashboardPage() {
           priority
         />
       </div>
-      <div className="grid grid-cols-4 gap-[50px] mt-10">
-        <Link href="/your_clubs"><Image src={your_clubs} alt="Your Clubs" width={500} height={500}></Image></Link>
-        <Link href="/explore_clubs"><Image src={explore_clubs} alt="Explore Clubs" width={500} height={500}></Image></Link>
-        <Link href="/calendar"><Image src={calendar} alt="Calendar" width={500} height={500}></Image></Link>
-        <Link href="/account"><Image src={account} alt="Account" width={500} height={500}></Image></Link>
-      </div>
+      <section className="dashboardGrid">
+        <Link href="/your_clubs" className="dashboardCard">
+          <Image src={your_clubs} alt="Your Clubs" width={500} height={500} />
+        </Link>
+        <Link href="/explore_clubs" className="dashboardCard">
+          <Image src={explore_clubs} alt="Explore Clubs" width={500} height={500} />
+        </Link>
+        <Link href="/calendar" className="dashboardCard">
+          <Image src={calendar} alt="Calendar" width={500} height={500} />
+        </Link>
+        <Link href="/account" className="dashboardCard">
+          <Image src={account} alt="Account" width={500} height={500} />
+        </Link>
+      </section>
     </main>
   );
 }

@@ -7,7 +7,7 @@
 }
 
 .navInner {
-  max-width: 980px;
+  max-width: 840px;
   margin: 0 auto;
   padding: 14px 24px;
 
@@ -65,7 +65,6 @@ h1 {
     text-decoration: none;
     color: rgb(192, 2, 2);
     font-size: 30px;
-    text-align: center;
 }
 
 h2 {
@@ -80,4 +79,632 @@ p {
     font-size: 16px;
     color: var(--foreground);
     line-height: 1.5;
+}
+
+.accountPage {
+  --account-ink: #111827;
+  --account-muted: #6b7280;
+  --account-line: rgba(15, 23, 42, 0.12);
+  --account-card: #ffffff;
+  --account-accent: #c00202;
+  --account-accent-strong: #7f1d1d;
+  --account-glow: rgba(192, 2, 2, 0.12);
+
+  padding: 28px 24px 48px;
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  gap: 22px;
+  color: var(--account-ink);
+  font-family: Montserrat, sans-serif;
+  position: relative;
+}
+
+.accountPage::before,
+.accountPage::after {
+  content: "";
+  position: absolute;
+  inset: auto auto 12% -10%;
+  width: 220px;
+  height: 220px;
+  border-radius: 40% 60% 70% 30%;
+  background: radial-gradient(circle at 30% 30%, rgba(192, 2, 2, 0.18), transparent 60%);
+  filter: blur(2px);
+  z-index: -1;
+}
+
+.accountPage::after {
+  inset: 8% -8% auto auto;
+  width: 180px;
+  height: 180px;
+  border-radius: 55% 45% 60% 40%;
+  background: radial-gradient(circle at 70% 30%, rgba(15, 23, 42, 0.12), transparent 60%);
+}
+
+.accountLoading,
+.accountEmpty {
+  padding: 24px;
+  opacity: 0.75;
+}
+
+.accountHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #fff7f7, #f8fafc);
+  border: 1px solid var(--account-line);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.accountHeaderCopy {
+  display: grid;
+  gap: 6px;
+}
+
+.accountKicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-weight: 700;
+  color: var(--account-muted);
+}
+
+.accountTitle {
+  margin: 4px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--account-accent);
+}
+
+.accountSubtle {
+  font-size: 14px;
+  color: var(--account-muted);
+}
+
+.accountGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.accountCard {
+  border: 1px solid var(--account-line);
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--account-card);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.accountCardTitle {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.accountCardSub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--account-muted);
+}
+
+.accountForm {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.accountInputRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.accountInput {
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  border-radius: 12px;
+  font-size: 14px;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.accountInput:focus {
+  outline: none;
+  border-color: var(--account-accent);
+  box-shadow: 0 0 0 3px var(--account-glow);
+}
+
+.accountButtonPrimary,
+.accountButtonSecondary {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--account-ink);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.accountButtonPrimary {
+  background: var(--account-ink);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+}
+
+.accountButtonPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.28);
+}
+
+.accountButtonSecondary {
+  background: #fff;
+  color: var(--account-ink);
+}
+
+.accountButtonSecondary:hover {
+  transform: translateY(-1px);
+  border-color: var(--account-accent);
+}
+
+.accountProfileList {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.accountProfileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.accountProfileLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--account-muted);
+  font-weight: 700;
+}
+
+.accountProfileValue {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.accountMessage {
+  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid;
+  width: fit-content;
+}
+
+.accountMessageSuccess {
+  color: #166534;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.accountMessageError {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+@media (max-width: 900px) {
+  .accountHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .accountInputRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.explorePage {
+  --explore-ink: #111827;
+  --explore-muted: #6b7280;
+  --explore-line: rgba(15, 23, 42, 0.12);
+  --explore-card: #ffffff;
+  --explore-accent: #c00202;
+  --explore-glow: rgba(192, 2, 2, 0.12);
+
+  padding: 28px 24px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+  color: var(--explore-ink);
+  position: relative;
+}
+
+.explorePage::before,
+.explorePage::after {
+  content: "";
+  position: absolute;
+  inset: 10% auto auto -8%;
+  width: 220px;
+  height: 220px;
+  border-radius: 35% 65% 70% 30%;
+  background: radial-gradient(circle at 30% 30%, rgba(192, 2, 2, 0.14), transparent 60%);
+  z-index: -1;
+}
+
+.explorePage::after {
+  inset: auto -10% 12% auto;
+  width: 200px;
+  height: 200px;
+  border-radius: 55% 45% 60% 40%;
+  background: radial-gradient(circle at 70% 30%, rgba(15, 23, 42, 0.12), transparent 60%);
+}
+
+.exploreHero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-radius: 20px;
+  border: 1px solid var(--explore-line);
+  background: linear-gradient(120deg, #fff7f7, #f8fafc);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.exploreHeroCopy {
+  display: grid;
+  gap: 6px;
+}
+
+.exploreKicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-weight: 700;
+  color: var(--explore-muted);
+}
+
+.exploreTitle {
+  margin: 4px 0 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--explore-accent);
+}
+
+.exploreSubtitle {
+  margin: 0;
+  font-size: 15px;
+  color: var(--explore-muted);
+}
+
+.exploreControls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.exploreField {
+  display: grid;
+  gap: 8px;
+}
+
+.exploreLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--explore-muted);
+}
+
+.exploreInline {
+  display: flex;
+  gap: 10px;
+}
+
+.exploreInput {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  font-size: 14px;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+}
+
+.exploreInput:focus {
+  outline: none;
+  border-color: var(--explore-accent);
+  box-shadow: 0 0 0 3px var(--explore-glow);
+}
+
+.exploreGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.exploreCard {
+  border-radius: 18px;
+  border: 1px solid var(--explore-line);
+  background: var(--explore-card);
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  display: grid;
+}
+
+.exploreCardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.exploreCardTitle {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.exploreCardSub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--explore-muted);
+}
+
+.explorePill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  font-size: 12px;
+  font-weight: 700;
+  height: fit-content;
+  background: #fff;
+}
+
+.exploreTags {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.exploreTag,
+.exploreTagMuted,
+.exploreTagStrong {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.exploreTag {
+  border: 1px solid #cbd5f5;
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.exploreTagStrong {
+  border: 1px solid #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.exploreTagMuted {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.exploreActions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.exploreButtonPrimary,
+.exploreButtonDisabled,
+.exploreGhostButton {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--explore-ink);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exploreButtonPrimary {
+  background: var(--explore-ink);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+}
+
+.exploreButtonPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.28);
+}
+
+.exploreButtonDisabled {
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.exploreGhostButton {
+  background: #fff;
+  color: var(--explore-ink);
+  border-color: rgba(15, 23, 42, 0.2);
+}
+
+.exploreGhostButton:hover {
+  transform: translateY(-1px);
+  border-color: var(--explore-accent);
+}
+
+.exploreStatusCard {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #f8fafc;
+  font-size: 14px;
+}
+
+.exploreMessage {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 14px;
+  width: fit-content;
+}
+
+.exploreFooterNote {
+  font-size: 13px;
+  color: var(--explore-muted);
+}
+
+.exploreFooterCta {
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px dashed rgba(15, 23, 42, 0.2);
+  background: #f8fafc;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--explore-ink);
+}
+
+.exploreFooterLink {
+  color: #111827;
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .exploreHero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .exploreControls {
+    grid-template-columns: 1fr;
+  }
+
+  .exploreInline {
+    flex-direction: column;
+  }
+}
+
+.dashboardPage {
+  --dashboard-ink: #111827;
+  --dashboard-muted: #6b7280;
+  --dashboard-line: rgba(15, 23, 42, 0.12);
+  --dashboard-card: #ffffff;
+  --dashboard-accent: #c00202;
+  --dashboard-glow: rgba(192, 2, 2, 0.12);
+
+  padding: 32px 24px 56px;
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  gap: 26px;
+  color: var(--dashboard-ink);
+  position: relative;
+}
+
+.dashboardPage::before,
+.dashboardPage::after {
+  content: "";
+  position: absolute;
+  inset: 6% auto auto -10%;
+  width: 240px;
+  height: 240px;
+  border-radius: 35% 65% 70% 30%;
+  background: radial-gradient(circle at 30% 30%, rgba(192, 2, 2, 0.14), transparent 60%);
+  z-index: -1;
+}
+
+.dashboardPage::after {
+  inset: auto -10% 10% auto;
+  width: 210px;
+  height: 210px;
+  border-radius: 55% 45% 60% 40%;
+  background: radial-gradient(circle at 70% 30%, rgba(15, 23, 42, 0.12), transparent 60%);
+}
+
+.dashboardBrand {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.dashboardCard {
+  border-radius: 22px;
+  border: 1px solid var(--dashboard-line);
+  background: var(--dashboard-card);
+  padding: 8px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  display: grid;
+  gap: 12px;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.dashboardCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+  border-color: rgba(192, 2, 2, 0.35);
+}
+
+.dashboardCard img {
+  width: 84%;
+  height: auto;
+  border-radius: 13px;
+  margin: 0 auto;
+}
+
+.dashboardLabel {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--dashboard-ink);
+}
+
+@media (max-width: 1100px) {
+  .dashboardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
 }
